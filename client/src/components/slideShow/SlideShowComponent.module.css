@@ -1,0 +1,59 @@
+/* slideShowComponent.module.css */
+
+.gridContainer {
+    width: 60%;
+    height: 60%;
+    max-width: 60%;
+    max-height: 60%;
+    display: grid;
+    grid-template-columns: 2fr 6fr 2fr;
+    grid-template-rows: auto;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .gridItem {
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    align-items: center;
+    text-align: center;
+    height: 400px; /* Fixed height */
+    overflow-y: auto; /* Enable vertical scrolling if content overflows */
+    padding: 1rem;
+  }
+  
+  .gridItem img {
+    max-width: 100%;
+    max-height: 50%; /* Limit the height of the image */
+    object-fit: contain;
+    margin-bottom: 1rem;
+  }
+  
+  .gridItem h2 {
+    margin: 0.5rem 0;
+  }
+  
+  .gridItem p {
+    margin: 0;
+  }
+  
+  .gridButtonContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .gridButton {
+    background-color: transparent;
+    border: none;
+    color: #007bff;
+    font-size: 2rem;
+    cursor: pointer;
+  }
+  
+  .gridButton:hover {
+    color: #0056b3;
+  }
+      
