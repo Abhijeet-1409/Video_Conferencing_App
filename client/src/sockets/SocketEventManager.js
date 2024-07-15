@@ -63,8 +63,12 @@ class SocketEventManager {
         this.socket.emit('message_Sent',{roomId,msgObj});
     }
     
-    initialMicAndCamera({isMicActive,isCameraActive,remoteSocketId}){
-       this.socket.emit('intial_Mic_Camera_Status',{isMicActive,isCameraActive,remoteSocketId});  
+    initialMicOrCamera({kind,value,remoteSocketId}){
+       this.socket.emit('intial_Mic_Or_Camera_Status',{kind,value,remoteSocketId});  
+    }
+    
+    askForInitialCameraOrMicStatus(data){
+       this.socket.emit('ask_For_Initial_Camera_Or_Mic_Status',data);   
     }
 
 }

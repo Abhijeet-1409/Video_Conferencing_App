@@ -11,17 +11,19 @@ export default function VideoComponent({ connection }) {
     const divRef = useRef(null);
     const iconRef = useRef(null);
     const videoRef = useRef(null);
+    
+    useEffect(()=>{
+        if (videoRef.current) {
+            videoRef.current.srcObject = connection.remoteStream;
+        }
+    },[videoRef.current,connection.remoteStream]);
 
     useEffect(() => {
         const handleTrack = (event) => {
             event.streams[0].getTracks().forEach((track) => {
                 console.log(`Track added: ${track.kind}`);
                 connection.remoteStream.addTrack(track);
-                if (track.kind === 'video') {
-                    setCamera(true);
-                } else {
-                    setMic(false);
-                }
+                socketConnection.askForInitialCameraOrMicStatus({kind : track.kind,remoteSocketId : connection.remoteSocketId});
             });
         };
 
@@ -45,27 +47,34 @@ export default function VideoComponent({ connection }) {
                 setCamera(isCameraActive);
             }
         };
-
+         
+        const handleInitialMicOrCamera =({kind,value,sender_SocketId}) =>{
+            if(connection.remoteSocketId === sender_SocketId){
+                if(kind === 'video'){
+                  setCamera(value);
+                } 
+                else{
+                  setMic(value);
+                } 
+            }
+        };
+        
         socketConnection.socket.on("msgToToggleVideo", handleToggleVideo);
         socketConnection.socket.on("msgTotoggleAudio", handleToggleAudio);
         connection.peerConnection.addEventListener('track', handleTrack);
-        socketConnection.socket.on("receive_Initial_Mic_Camera_Status", handleInitialMicAndCamera);
-
+        socketConnection.socket.on("receive_Intial_Mic_Or_Camera_Status",handleInitialMicOrCamera);
+        
         return () => {
             socketConnection.socket.off("msgToToggleVideo", handleToggleVideo);
             socketConnection.socket.off("msgTotoggleAudio", handleToggleAudio);
             connection.peerConnection.removeEventListener('track', handleTrack);
-            socketConnection.socket.off("receive_Initial_Mic_Camera_Status", handleInitialMicAndCamera);
+            socketConnection.socket.off("receive_Intial_Mic_Or_Camera_Status",handleInitialMicOrCamera);
         };
-    }, [connection]);
+    }, []);
 
     useEffect(() => {
         const micDisplayZindex = mic ? 2 : -2;
         const imageDisplayZindex = !camera ? 1 : -1;
-
-        if (videoRef.current) {
-            videoRef.current.srcObject = connection.remoteStream;
-        }
 
         if (iconRef.current) {
             iconRef.current.style.zIndex = micDisplayZindex;

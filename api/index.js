@@ -174,11 +174,15 @@ io.on("connection", (socket) => {
   //    io.to(receiver_SocketId).emit("update_Peer",offerObj);
   // });
 
-  socket.on("intial_Mic_Camera_Status",({isMicActive,isCameraActive,remoteSocketId})=>{
-       console.log("intial_Mic_Camera_Status");
-       io.to(remoteSocketId).emit("receive_Intial_Mic_Camera_Status",{isMicActive,isCameraActive,sender_SocketId : socket.id});
+  socket.on("intial_Mic_Or_Camera_Status",({kind,value,remoteSocketId})=>{
+       console.log("intial_Mic_Or_Camera_Status");
+       io.to(remoteSocketId).emit("receive_Intial_Mic_Or_Camera_Status",{kind,value,sender_SocketId : socket.id});
   }); 
-
+  
+  socket.on("ask_For_Initial_Camera_Or_Mic_Status",({kind,remoteSocketId})=>{
+       console.log("ask_For_Initial_Camera_Or_Mic_Status");
+       io.to(remoteSocketId).emit("receive_Request_For_Inital_Media_Device_Status",{kind,sender_SocketId:socket.id});
+  });
 
 });
 

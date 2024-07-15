@@ -28,6 +28,7 @@ export default function JoinPage() {
   const [isModelOpen, setIsModelOpen] = useState(false);
   const mediaRef = useRef();
   const inputRef = useRef();
+  const divRef = useRef();
 
   const maxNoOfDevices = 9;
 
@@ -79,6 +80,7 @@ export default function JoinPage() {
       }
       else {
         console.log("turning off camera");
+
       }
       socketConnection.toggleVideo(roomId);
     }
@@ -213,15 +215,17 @@ export default function JoinPage() {
     if(mediaRef.current){
       mediaRef.current.srcObject = localStream;
     }
+    
  },[mediaRef.current]);
 
+ useEffect(()=>{
+     if(divRef.current){
+       let value =  isCameraActive ? -1 : 1;
+       divRef.current.style.zIndex =  value;
+     }
+ },[isCameraActive]);
 
   useEffect(() => {
-    // Determine grid layout based on number of devices
-
-    // if (localStream) {
-    //   mediaRef.current.srcObject = localStream;
-    // }
 
     let cols, rows;
     let totalDevice = peerConnections.length + 1;
@@ -241,7 +245,6 @@ export default function JoinPage() {
         const peerConnectionObj = await createPeerConnAndOffer({ localStream, roomId, remoteSocketId, userData, socketConnection, remoteUserData });
         addPeerConnection(peerConnectionObj);
         setParticipants(roomParticipants);
-        socketConnection.initialMicAndCamera({isMicActive,isCameraActive,remoteSocketId});
       } catch (error) {
         console.log(error);
       }
@@ -292,6 +295,13 @@ export default function JoinPage() {
       });
     }
     
+    const handleIntialMediaDeviceStatus = ({kind,sender_SocketId}) => {
+       console.log("receive_Request_For_Inital_Media_Device_Status");
+       const value = kind === 'video' ? isCameraActive : !isMicActive;
+       socketConnection.initialMicOrCamera({kind,value,remoteSocketId:sender_SocketId});
+    }
+
+
     socketConnection.socket.on("offer_Update", handleOfferUpdate);
     socketConnection.socket.on("newUserJoined", handleNewUserJoin);
     socketConnection.socket.on("answer_Update", handleAnswerUpdate);
@@ -301,6 +311,7 @@ export default function JoinPage() {
     socketConnection.socket.on("received_ICE_Candidate", handleICECandidate);
     socketConnection.socket.on("received_offer_for_you", handleRecievedOffer);
     socketConnection.socket.on("received_answer_for_you", handleRecievedAnswer);
+    socketConnection.socket.on("receive_Request_For_Inital_Media_Device_Status",handleIntialMediaDeviceStatus);
 
     return () => {
       socketConnection.socket.off("offer_Update", handleOfferUpdate);
@@ -312,11 +323,14 @@ export default function JoinPage() {
       socketConnection.socket.off("received_ICE_Candidate", handleICECandidate);
       socketConnection.socket.off("received_offer_for_you", handleRecievedOffer);
       socketConnection.socket.off("received_answer_for_you", handleRecievedAnswer);
+      socketConnection.socket.off("receive_Request_For_Inital_Media_Device_Status",handleIntialMediaDeviceStatus);
     };
 
   }, [peerConnections]);
 
-
+  
+//  console.log("mediaRef.current : ",mediaRef.current);
+//  console.log("divRef.current : ",divRef.current);
 
   return (
     <>
@@ -338,11 +352,10 @@ export default function JoinPage() {
         <div className={style.mainGridItemOne}>
           <div className={style.devices} style={gridStyle}>
             <div key={socketConnection.socket.id} className={style.mediaDevice}>
-              {(isCameraActive ?
-                (<video ref={mediaRef} autoPlay muted className={style.videotag}></video>) :
-                (<div className={style.imageContainer}>
+              <video ref={mediaRef} autoPlay muted className={style.videotag}></video>
+              <div ref={divRef} className={style.imageContainer}>
                   <img className={style.userProfile} src={userData.picture} alt="user-profile" />
-                </div>))}
+              </div>
             </div>
             { peerConnections.map(connection => {
               return (<VideoComponent key={connection?.remoteSocketId} connection={connection} />);
