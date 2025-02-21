@@ -7,7 +7,10 @@ import JoinPage from './pages/join/JoinPage';
 import AppContextProvider from './store/app-context';
 import { AppContext } from './store/app-context';
 import { useContext } from 'react';
-import Cookies from 'js-cookie';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
+const clientId = import.meta.env.VITE_CLIENT_ID;
+
 function App() {
   
   const  SecureJoin  = ()=> {
@@ -34,9 +37,11 @@ function App() {
   ]);
 
   return (
+     <GoogleOAuthProvider clientId={clientId}>
      <AppContextProvider>
        <RouterProvider router={router} />
      </AppContextProvider>
+     </GoogleOAuthProvider>
    
   )
 }

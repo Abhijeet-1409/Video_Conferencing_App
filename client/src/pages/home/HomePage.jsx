@@ -5,9 +5,10 @@ import SlideShow from '../../components/slideShow/SlideShowComponent';
 import DialogBox from '../../components/dialogBox/DialogBoxComponent';
 import Cookies from 'js-cookie';
 import { useContext, useEffect, useRef, useState } from 'react';
-const clientId = import.meta.env.VITE_CLIENT_ID;
 import { AppContext } from '../../store/app-context';
 import { useNavigate } from 'react-router-dom';
+import { GoogleLogin, googleLogout } from '@react-oauth/google';
+import {jwtDecode} from 'jwt-decode';
 
 export default function HomePage() {
     const { userData, socketConnection, setRoomId, setUserData, setParticipants } = useContext(AppContext);
@@ -18,82 +19,14 @@ export default function HomePage() {
     const navigate = useNavigate();
     const inputRef = useRef();
 
-    const handleClick = () => {
-        if (userData) {
-            handleLogout();
-            return;
-        }
-        const callbackUrl = `${window.location.origin}`;
-        Cookies.set('callbackUrl', callbackUrl);
-        const targetUrl = `https://accounts.google.com/o/oauth2/auth?redirect_uri=${encodeURIComponent(
-            callbackUrl
-        )}&response_type=token&client_id=${clientId}&scope=openid%20email%20profile`;
-
-        window.location.href = targetUrl;
-    };
+    let MsgTag = <><h2>{msg}</h2></>;
 
     const handleLogout = () => {
-        Cookies.remove('callbackUrl');
-        Cookies.remove('access_token');
-        Cookies.remove("roomId");
+        googleLogout();
         setUserData(null);
         setRoomId("");
         setParticipants([]);
     };
-
-    const getUserDetails = async (accessToken) => {
-        try {
-            const response = await fetch(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${accessToken}`);
-            const data = await response.json();
-            setUserData(data);
-            setImageKey(Date.now()); // Update the imageKey state to force a re-render
-            // console.log(data.picture);
-        } catch (error) {
-            console.error('Error fetching user details:', error);
-        }
-    };
-
-    useEffect(() => {
-        const accessTokenRegex = /access_token=([^&]+)/;
-        const isMatch = window.location.href.match(accessTokenRegex);
-        const access_token = Cookies.get('access_token');
-        if (access_token) {
-            getUserDetails(access_token);
-        }
-        if (isMatch && !access_token) {
-            const accessToken = isMatch[1];
-            Cookies.set("access_token", accessToken);
-            const callbackUrl = Cookies.get('callbackUrl');
-            window.location.href = callbackUrl;
-        }
-
-        const handleRoom = (roomId) => {
-            setLocalRoomId(roomId);
-            setIsModelOpen(true);
-        };
-
-        const handleJoinRoomSucc = (participants) => {
-            setRoomId(Cookies.get("roomId"));
-            setParticipants(participants);
-            navigate('/join');
-        };
-
-        const handleJoinRoomUnSucc = (msg) => {
-            setMsg(msg);
-            setIsModelOpen(true);
-            Cookies.remove("roomId");
-        };
-
-        socketConnection.socket.on("roomCreatedSuccessfully", handleRoom);
-        socketConnection.socket.on("joinRoomSuccessfully", handleJoinRoomSucc);
-        socketConnection.socket.on("joinRoomUnSuccessful", handleJoinRoomUnSucc);
-        return () => {
-            socketConnection.socket.off("roomCreatedSuccessfully", handleRoom);
-            socketConnection.socket.off("joinRoomSuccessfully", handleJoinRoomSucc);
-            socketConnection.socket.off("joinRoomUnSuccessful", handleJoinRoomUnSucc);
-        };
-
-    }, []);
 
     const handleCreate = () => {
         if (userData) {
@@ -122,7 +55,34 @@ export default function HomePage() {
         inputRef.current.value = '';
     };
 
-    let MsgTag = <><h2>{msg}</h2></>;
+    useEffect(() => {
+        const handleRoom = (roomId) => {
+            setLocalRoomId(roomId);
+            setIsModelOpen(true);
+        };
+
+        const handleJoinRoomSucc = (participants) => {
+            setRoomId(Cookies.get("roomId"));
+            setParticipants(participants);
+            navigate('/join');
+        };
+
+        const handleJoinRoomUnSucc = (msg) => {
+            setMsg(msg);
+            setIsModelOpen(true);
+            Cookies.remove("roomId");
+        };
+
+        socketConnection.socket.on("roomCreatedSuccessfully", handleRoom);
+        socketConnection.socket.on("joinRoomSuccessfully", handleJoinRoomSucc);
+        socketConnection.socket.on("joinRoomUnSuccessful", handleJoinRoomUnSucc);
+        return () => {
+            socketConnection.socket.off("roomCreatedSuccessfully", handleRoom);
+            socketConnection.socket.off("joinRoomSuccessfully", handleJoinRoomSucc);
+            socketConnection.socket.off("joinRoomUnSuccessful", handleJoinRoomUnSucc);
+        };
+
+    }, []);
     
     return (
         <>
@@ -153,13 +113,24 @@ export default function HomePage() {
             </DialogBox>
             <main className={styles.gridContainer}>
                 <div className={styles.gridItemOne}>
-                    <button className={styles.imageButton} onClick={handleClick}>
+                    { userData ?  (<button className={styles.imageButton} onClick={handleLogout}>
                         <img
                             src={userData?.picture ? userData.picture : profile}
                             alt="profile"
                             key={imageKey}
                         />
-                    </button>
+                    </button>)  :  (<GoogleLogin onSuccess={
+                        (credentialResponse)=>{
+                            let credential = credentialResponse.credential;
+                            let userInfo = jwtDecode(credential);
+                            setUserData(userInfo);
+                        }}
+                        onError={(err)=>{
+                            console.log(`failed to login ${err}`)
+                        }}
+                     />)
+                    }
+                   
                 </div>
                 <div className={styles.gridItemTwo}>
                     <SlideShow></SlideShow>
