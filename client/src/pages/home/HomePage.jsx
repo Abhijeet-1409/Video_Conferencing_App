@@ -1,3 +1,5 @@
+// HomePage.jsx
+
 import styles from './HomePage.module.css';
 import Button from '../../components/button/Button';
 import profile from '../../assets/profile.png';
@@ -8,7 +10,7 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '../../store/app-context';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin, googleLogout } from '@react-oauth/google';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 export default function HomePage() {
     const { userData, socketConnection, setRoomId, setUserData, setParticipants } = useContext(AppContext);
@@ -83,7 +85,7 @@ export default function HomePage() {
         };
 
     }, []);
-    
+
     return (
         <>
             <DialogBox open={isModelOpen} closeModal={handleCloseModal}>
@@ -113,33 +115,32 @@ export default function HomePage() {
             </DialogBox>
             <main className={styles.gridContainer}>
                 <div className={styles.gridItemOne}>
-                    { userData ?  (<button className={styles.imageButton} onClick={handleLogout}>
+                    {userData ? (<button className={styles.imageButton} onClick={handleLogout}>
                         <img
                             src={userData?.picture ? userData.picture : profile}
                             alt="profile"
                             key={imageKey}
                         />
-                    </button>)  :  (<GoogleLogin onSuccess={
-                        (credentialResponse)=>{
+                    </button>) : (<GoogleLogin onSuccess={
+                        (credentialResponse) => {
                             let credential = credentialResponse.credential;
                             let userInfo = jwtDecode(credential);
                             setUserData(userInfo);
                         }}
-                        onError={(err)=>{
+                        onError={(err) => {
                             console.log(`failed to login ${err}`)
                         }}
-                     />)
+                    />)
                     }
-                   
+
                 </div>
                 <div className={styles.gridItemTwo}>
                     <SlideShow></SlideShow>
                     <div className={styles.container}>
                         <Button handleClick={handleCreate}>Create</Button>
-                        <div>
-                            <Button handleClick={handleJoin}>Join</Button>
-                            <input type="text" name="roomId" id="roomId" ref={inputRef} className={styles.inputBox} />
-                        </div>
+                        <Button handleClick={handleJoin}>Join</Button>
+                        <input type="text" name="roomId" id="roomId" ref={inputRef} className={styles.inputBox} />
+
                     </div>
                 </div>
             </main>

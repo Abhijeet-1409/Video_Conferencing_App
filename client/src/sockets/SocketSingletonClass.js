@@ -9,7 +9,7 @@ class Socket {
 
     constructor() {
         if (!Socket.instance) {
-            this.socket = io("http://localhost:3000", {
+            this.socket = io("http://localhost:8000", {
                 transports: ['websocket'], // Ensure only websocket transport is used
                 withCredentials: false, // Disable sending cookies in cross-origin requests
                 extraHeaders: {
