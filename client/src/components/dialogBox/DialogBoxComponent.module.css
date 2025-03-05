@@ -1,7 +1,7 @@
 /* dialogBoxComponent.module.css */
 
 .dialogBox {
-    width: 50%;
+    width: 90%;
     max-width: 500px;
     padding: 20px;
     border: none;
@@ -19,14 +19,17 @@
     margin-bottom: 20px;
 }
 
-.dialogButton {
-    background-color: #007bff;
+.dialogButton, .dialogCloseButton {
     color: #fff;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+}
+
+.dialogButton {
+    background-color: #007bff;
 }
 
 .dialogButton:hover {
@@ -35,12 +38,6 @@
 
 .dialogCloseButton {
     background-color: #dc3545;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
 }
 
 .dialogCloseButton:hover {
@@ -58,4 +55,42 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
+}
+
+/* Mobile (Up to 480px) */
+@media (max-width: 480px) {
+    .dialogBox {
+        width: 80%;
+        padding: 15px;
+        font-size: 0.9rem;
+    }
+
+    .dialogButton, .dialogCloseButton {
+        padding: 8px 15px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Tablet (481px to 1024px) */
+@media (min-width: 481px) and (max-width: 1024px) {
+    .dialogBox {
+        width: 80%;
+        max-width: 400px;
+    }
+
+    .dialogButton, .dialogCloseButton {
+        font-size: 1rem;
+    }
+}
+
+/* Laptop and Desktop (1025px and above) */
+@media (min-width: 1025px) {
+    .dialogBox {
+        width: 50%;
+        max-width: 500px;
+    }
+
+    .dialogButton, .dialogCloseButton {
+        font-size: 1.1rem;
+    }
 }

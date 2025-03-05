@@ -96,8 +96,9 @@ export default function HomePage() {
                         localRoomId.length > 0 && msg.length === 0 && (
                             <>
                                 <h2>Here's your joining info</h2>
-                                <p>Send this to people you want to meet with. Be sure to save it so you can use it later, too.</p>
-                                <p>http://localhost:5173/roomid={localRoomId}</p>
+                                <p>Send this to people you want to meet with.</p>
+                                <p>Be sure to save it so you can use it <span className={styles.nowrap}>later, too.</span></p>
+                                {/* <p>http://localhost:5173/roomid={localRoomId}</p> */}
                                 <p><strong>code</strong> : {localRoomId}</p>
                             </>
                         )

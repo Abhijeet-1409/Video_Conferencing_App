@@ -62,7 +62,7 @@ io.on("connection", (socket) => {
 
   socket.on('createRoom', () => {
     console.log("createRoom");
-    const roomId = Math.floor(Math.random() * 10000000).toString();
+    const roomId = Math.floor(Math.random() * 1000000).toString();
     rooms.push({ roomId, 'participants': [] });
     socket.emit('roomCreatedSuccessfully', roomId);
   });
@@ -190,5 +190,5 @@ io.on("connection", (socket) => {
 
 
 server.listen(8000, () => {
-  console.log('Server is running on http://localhost:3000');
+  console.log('Server is running on http://localhost:8000');
 });
