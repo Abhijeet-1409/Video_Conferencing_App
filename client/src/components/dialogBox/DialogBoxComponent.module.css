@@ -1,96 +1,101 @@
-/* dialogBoxComponent.module.css */
-
-.dialogBox {
-    width: 90%;
-    max-width: 500px;
-    padding: 20px;
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #fff;
-}
-
-.dialogContent {
-    margin-bottom: 20px;
-}
-
-.dialogButton, .dialogCloseButton {
+.mediaDevice {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    border: 2px solid #444;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #2c2c2c;
     color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    overflow: hidden;
 }
 
-.dialogButton {
-    background-color: #007bff;
-}
-
-.dialogButton:hover {
-    background-color: #0056b3;
-}
-
-.dialogCloseButton {
-    background-color: #dc3545;
-}
-
-.dialogCloseButton:hover {
-    background-color: #c82333;
-}
-
-.dialogOverlay {
-    position: fixed;
+.videotag {
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    object-fit: cover;
+    border-radius: 10px;
+    z-index: 0;
+}
+
+.fontIcon {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+    font-size: 1.5rem;
+    color: #ff4d4d;
+}
+
+.imageContainer {
+    position: absolute;
     display: flex;
-    align-items: center;
     justify-content: center;
-    z-index: 1000;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    background-color: #2c2c2c;
+    z-index: 1;
+}
+
+.userProfile {
+    border-radius: 50%;
+    width: 30%;
+    height: 30%;
+    z-index: 2;
+    background: transparent;
 }
 
 /* Mobile (Up to 480px) */
 @media (max-width: 480px) {
-    .dialogBox {
-        width: 80%;
-        padding: 15px;
-        font-size: 0.9rem;
+    .mediaDevice {
+        border-radius: 5px;
     }
-
-    .dialogButton, .dialogCloseButton {
-        padding: 8px 15px;
-        font-size: 0.85rem;
+    .fontIcon {
+        font-size: 1.2rem;
+        top: 5px;
+        left: 5px;
+    }
+    .userProfile {
+        width: 40%;
+        height: 40%;
     }
 }
 
 /* Tablet (481px to 1024px) */
 @media (min-width: 481px) and (max-width: 1024px) {
-    .dialogBox {
-        width: 80%;
-        max-width: 400px;
+    .mediaDevice {
+        border-radius: 8px;
     }
-
-    .dialogButton, .dialogCloseButton {
-        font-size: 1rem;
+    .fontIcon {
+        font-size: 1.3rem;
+        top: 8px;
+        left: 8px;
+    }
+    .userProfile {
+        width: 35%;
+        height: 35%;
     }
 }
 
 /* Laptop and Desktop (1025px and above) */
 @media (min-width: 1025px) {
-    .dialogBox {
-        width: 50%;
-        max-width: 500px;
+    .mediaDevice {
+        border-radius: 10px;
     }
-
-    .dialogButton, .dialogCloseButton {
-        font-size: 1.1rem;
+    .fontIcon {
+        font-size: 1.5rem;
+        top: 10px;
+        left: 10px;
+    }
+    .userProfile {
+        width: 30%;
+        height: 30%;
     }
 }
