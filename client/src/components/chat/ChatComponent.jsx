@@ -2,11 +2,11 @@
 import style from './ChatComponent.module.css';
 import { AppContext } from '../../store/app-context';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useContext, useRef, useState ,useEffect} from 'react';
-import {  faTimes, faPaperPlane} from '@fortawesome/free-solid-svg-icons';
+import { useContext, useRef, useState, useEffect } from 'react';
+import { faTimes, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 
 function ChatComponent({ isChatOpen, closeChat }) {
-    const {socketConnection,userData,roomId} = useContext(AppContext);
+    const { socketConnection, userData, roomId } = useContext(AppContext);
     const [messages, setMessages] = useState([]);
     const inputRef = useRef();
 
@@ -35,51 +35,53 @@ function ChatComponent({ isChatOpen, closeChat }) {
         }
     };
 
-    useEffect(()=>{
-        
+    useEffect(() => {
+
         const handleMessageRecieved = (msgObj) => {
             console.log('message recieved', msgObj);
             setMessages((pervMessages) => {
-              return [...pervMessages, msgObj];
+                return [...pervMessages, msgObj];
             });
-          }
+        }
 
         socketConnection.socket.on("message_Recieved", handleMessageRecieved);
 
-        return ()=>{
+        return () => {
             socketConnection.socket.off("message_Recieved", handleMessageRecieved);
         };
 
-    },[])
+    }, [])
 
     return (
         <div className={isChatOpen ? style.chat : style.chatClose}>
-            <div className={style.chatItem}>
-                <h2>In-call-message</h2>
-                <button className={style.closeButton} onClick={closeChat}>
-                    <FontAwesomeIcon icon={faTimes} />
-                </button>
-            </div>
-            <div className={style.message}>
-                {
-                    messages.map((msg, index) => {
-                        return (<div key={index} className={style.messageInfo} >
-                            <h4>{msg?.senderName}</h4>
-                            <p>{msg?.info}</p>
-                        </div>);
-                    })
-                }
-            </div>
-            <div className={style.messageInput}>
-                <input
-                    type="text"
-                    placeholder="Type your message..."
-                    ref={inputRef}
-                    onKeyDown={handleSendMessageByEnter}
-                />
-                <button className={style.sendButton} onClick={handleSendMessage}>
-                    <FontAwesomeIcon icon={faPaperPlane} />
-                </button>
+            <div className={style.mainGrid}>
+                <div className={style.chatItem}>
+                    <h2>In-call-message</h2>
+                    <button className={style.closeButton} onClick={closeChat}>
+                        <FontAwesomeIcon icon={faTimes} />
+                    </button>
+                </div>
+                <div className={style.message}>
+                    {
+                        messages.map((msg, index) => {
+                            return (<div key={index} className={style.messageInfo} >
+                                <h4>{msg?.senderName}</h4>
+                                <p>{msg?.info}</p>
+                            </div>);
+                        })
+                    }
+                </div>
+                <div className={style.messageInput}>
+                    <input
+                        type="text"
+                        placeholder="Type your message..."
+                        ref={inputRef}
+                        onKeyDown={handleSendMessageByEnter}
+                    />
+                    <button className={style.sendButton} onClick={handleSendMessage}>
+                        <FontAwesomeIcon icon={faPaperPlane} />
+                    </button>
+                </div>
             </div>
         </div>
     );
