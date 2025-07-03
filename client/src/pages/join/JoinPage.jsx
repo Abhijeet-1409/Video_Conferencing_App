@@ -11,6 +11,8 @@ import Cookies from 'js-cookie';
 import VideoComponent from '../../components/video/VideoComponent';
 import { createPeerConnAndOffer, AddRemoteIceCandidate, ResponseOffer, ResponseAnswer, reNegotiateConnections, createPeerConnetionObj } from '../../webRTC/webRTC-utilities';
 import ChatComponent from '../../components/chat/ChatComponent';
+import useIsMobile from '../../hooks/useIsMobile'; // adjust path as needed
+
 export default function JoinPage() {
   const { userData, peerConnections, offers, answers,
     roomId, localStream, socketConnection,
@@ -29,6 +31,7 @@ export default function JoinPage() {
   const [isModelOpen, setIsModelOpen] = useState(false);
   const mediaRef = useRef();
   const divRef = useRef();
+  const [isMobile,currentWidth] = useIsMobile(999);
 
   const maxNoOfDevices = 9;
 
@@ -205,8 +208,14 @@ export default function JoinPage() {
 
     let cols, rows;
     let totalDevice = peerConnections.length + 1;
-    cols = (totalDevice > 4 || totalDevice % 3 === 0) ? 3 : (totalDevice % 2 === 0) ? 2 : 1;
-    rows = (totalDevice > 6) ? 3 : (totalDevice > 3) ? 2 : 1;
+    if (totalDevice <= 3 && currentWidth <= 830){
+      cols = 1;
+      rows = totalDevice;
+    }
+    else{
+      cols = (totalDevice > 4 || totalDevice % 3 === 0) ? 3 : (totalDevice % 2 === 0) ? 2 : 1;
+      rows = (totalDevice > 6) ? 3 : (totalDevice > 3) ? 2 : 1;
+    }
 
     // Generate device list for grid
 
@@ -293,7 +302,7 @@ export default function JoinPage() {
       socketConnection.socket.off("receive_Request_For_Inital_Media_Device_Status", handleIntialMediaDeviceStatus);
     };
 
-  }, [peerConnections]);
+  }, [peerConnections,currentWidth]);
 
 
   //  console.log("mediaRef.current : ",mediaRef.current);
@@ -317,7 +326,15 @@ export default function JoinPage() {
       </DialogBox>
       <main className={style.mainGrid}>
         <div className={style.mainGridItemOne}>
-          <div className={style.devices} style={gridStyle}>
+          <div
+            className={`
+              ${style.devices}
+              ${style.videoGridWrapper}
+              ${isMobile && isChatOpen ? style.hideOnMobile : ''}
+              ${!isMobile && isChatOpen ? style.shrinkWidth : style.fullWidth}
+            `}
+            style={gridStyle}
+          >
             <div key={socketConnection.socket.id} className={style.mediaDevice}>
               <video ref={mediaRef} autoPlay muted className={style.videotag}></video>
               <div ref={divRef} className={style.imageContainer}>
@@ -331,12 +348,21 @@ export default function JoinPage() {
                 />
               </div>
             </div>
-            {peerConnections.map(connection => {
-              return (<VideoComponent key={connection?.remoteSocketId} connection={connection} />);
-            })}
+
+            {peerConnections.map(connection => (
+              <VideoComponent key={connection?.remoteSocketId} connection={connection} />
+            ))}
           </div>
-          <ChatComponent closeChat={closeChat} isChatOpen={isChatOpen} />
+
+          <div className={`
+            ${style.chatWrapper}
+            ${isMobile && !isChatOpen ? style.hideOnMobile : ''}
+            ${!isMobile && !isChatOpen ? style.zeroWidth : ''}
+          `}>
+            <ChatComponent closeChat={closeChat} isChatOpen={isChatOpen} />
+          </div>
         </div>
+
         <div className={style.mainGridItemTwo}>
           <button
             className={`${style.controlButton} ${!isMicActive ? style.active : ''}`}
