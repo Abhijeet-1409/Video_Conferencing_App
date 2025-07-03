@@ -53,3 +53,11 @@
     background: transparent;
     z-index: 2;
 }
+
+
+@media screen and (max-width: 999px) {
+    .mediaDevice{
+        height: 90%;
+        width: 90%;
+    }
+}
