@@ -2,7 +2,7 @@
 
 import styles from './HomePage.module.css';
 import Button from '../../components/button/Button';
-import profile from '../../assets/profile.png';
+import fallbackProfile from '../../assets/profile.png';;
 import SlideShow from '../../components/slideShow/SlideShowComponent';
 import DialogBox from '../../components/dialogBox/DialogBoxComponent';
 import Cookies from 'js-cookie';
@@ -118,9 +118,12 @@ export default function HomePage() {
                 <div className={styles.gridItemOne}>
                     {userData ? (<button className={styles.imageButton} onClick={handleLogout}>
                         <img
-                            src={userData?.picture ? userData.picture : profile}
+                            src={userData?.picture}
                             alt="profile"
                             key={imageKey}
+                             onError={(e) => {
+                                e.currentTarget.src = fallbackProfile;
+                            }}
                         />
                     </button>) : (<GoogleLogin onSuccess={
                         (credentialResponse) => {

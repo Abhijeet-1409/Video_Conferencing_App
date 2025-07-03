@@ -1,5 +1,5 @@
 //JoinPage.jsx
-
+import fallbackProfile from '../../assets/profile.png';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMicrophone, faVideo, faComments, faTimes, faPaperPlane, faPhone } from '@fortawesome/free-solid-svg-icons';
@@ -36,8 +36,8 @@ export default function JoinPage() {
     setIsChatOpen(false);
   };
 
-  const openChat = () => {
-    setIsChatOpen(true);
+  const toggleChat = () => {
+    setIsChatOpen(prevValue => !prevValue);
   };
 
   // Toggle microphone
@@ -321,7 +321,14 @@ export default function JoinPage() {
             <div key={socketConnection.socket.id} className={style.mediaDevice}>
               <video ref={mediaRef} autoPlay muted className={style.videotag}></video>
               <div ref={divRef} className={style.imageContainer}>
-                <img className={style.userProfile} src={userData.picture} alt="user-profile" />
+                <img
+                  className={style.userProfile}
+                  src={userData.picture}
+                  alt="user-profile"
+                  onError={(e) => {
+                    e.currentTarget.src = fallbackProfile;
+                  }}
+                />
               </div>
             </div>
             {peerConnections.map(connection => {
@@ -343,7 +350,7 @@ export default function JoinPage() {
           >
             <FontAwesomeIcon icon={faVideo} />
           </button>
-          <button className={style.controlButton} onClick={openChat}>
+          <button className={style.controlButton} onClick={toggleChat}>
             <FontAwesomeIcon icon={faComments} />
           </button>
           <button className={style.phoneButton} onClick={handleHangUp}>
