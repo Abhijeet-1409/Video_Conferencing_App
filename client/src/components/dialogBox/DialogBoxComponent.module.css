@@ -1,101 +1,102 @@
-.mediaDevice {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    border-radius: 10px;
-    border: 2px solid #444;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #2c2c2c;
-    color: #fff;
-    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-    overflow: hidden;
-}
-
-.videotag {
-    position: absolute;
+/* Full-screen overlay backdrop */
+.dialogOverlay {
+    position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 10px;
-    z-index: 0;
-}
-
-.fontIcon {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 2;
-    font-size: 1.5rem;
-    color: #ff4d4d;
-}
-
-.imageContainer {
-    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
     display: flex;
-    justify-content: center;
     align-items: center;
-    height: 100%;
-    width: 100%;
-    background-color: #2c2c2c;
-    z-index: 1;
+    justify-content: center;
 }
 
-.userProfile {
-    border-radius: 50%;
-    width: 30%;
-    height: 30%;
-    z-index: 2;
-    background: transparent;
+/* Centered dialog box */
+.dialogBox {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 500px;
+    background-color: #ffffff;
+    color: #333;
+    padding: 0.75rem 1rem; /* 🔽 Reduced padding */
+    border-radius: 0.5rem;
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.25);
+    z-index: 1001;
+    animation: fadeIn 0.25s ease-out;
+    font-size: 1rem;
+    box-sizing: border-box;
 }
 
-/* Mobile (Up to 480px) */
+/* Modal content */
+.dialogContent {
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    line-height: 1.4;
+    text-align: center;
+}
+
+/* Primary action button */
+.dialogButton {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 0.4rem 0.9rem; /* 🔽 Slightly smaller button */
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 0 0.4rem;
+}
+
+.dialogButton:hover {
+    background-color: #0056b3;
+}
+
+/* Close button */
+.dialogCloseButton {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.9rem; /* 🔽 Reduced padding */
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 0.75rem;
+}
+
+.dialogCloseButton:hover {
+    background-color: #c82333;
+}
+
+/* Entry animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+/* 🔽 Responsive design for mobile */
 @media (max-width: 480px) {
-    .mediaDevice {
-        border-radius: 5px;
+    .dialogBox {
+        width: 85%;
+        max-width: 280px;          /* 🔽 Smaller width on mobile */
+        padding: 0.5rem 0.75rem;   /* 🔽 Reduced padding further */
+        font-size: 0.95rem;
     }
-    .fontIcon {
-        font-size: 1.2rem;
-        top: 5px;
-        left: 5px;
-    }
-    .userProfile {
-        width: 40%;
-        height: 40%;
-    }
-}
 
-/* Tablet (481px to 1024px) */
-@media (min-width: 481px) and (max-width: 1024px) {
-    .mediaDevice {
-        border-radius: 8px;
-    }
-    .fontIcon {
-        font-size: 1.3rem;
-        top: 8px;
-        left: 8px;
-    }
-    .userProfile {
-        width: 35%;
-        height: 35%;
-    }
-}
-
-/* Laptop and Desktop (1025px and above) */
-@media (min-width: 1025px) {
-    .mediaDevice {
-        border-radius: 10px;
-    }
-    .fontIcon {
-        font-size: 1.5rem;
-        top: 10px;
-        left: 10px;
-    }
-    .userProfile {
-        width: 30%;
-        height: 30%;
+    .dialogCloseButton,
+    .dialogButton {
+        width: 100%;
+        margin-top: 0.5rem;
     }
 }
