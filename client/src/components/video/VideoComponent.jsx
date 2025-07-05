@@ -101,6 +101,7 @@ export default function VideoComponent({ connection }) {
                         e.currentTarget.src = fallbackProfile;
                     }}
                 />
+                <p>{connection.remoteUserData.name}</p>
             </div>
         </div>
     );
