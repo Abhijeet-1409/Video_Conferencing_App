@@ -182,7 +182,7 @@ export default function JoinPage() {
           if (peerConnectionObj?.peerConnection) {
             ResponseAnswer({ peerConnections, answerObj, socketConnection });
           }
-          answers.responded = false;
+          answers.responded = true;
         }
       });
     }
@@ -195,7 +195,7 @@ export default function JoinPage() {
       mediaRef.current.srcObject = localStream;
     }
 
-  }, [mediaRef.current]);
+  }, [localStream]);
 
   useEffect(() => {
     if (divRef.current) {
@@ -208,7 +208,7 @@ export default function JoinPage() {
 
     let cols, rows;
     let totalDevice = peerConnections.length + 1;
-    if (totalDevice <= 3 && currentWidth <= 830){
+    if (totalDevice <= 3 && isMobile && currentWidth <= 830){
       cols = 1;
       rows = totalDevice;
     }
@@ -346,6 +346,7 @@ export default function JoinPage() {
                     e.currentTarget.src = fallbackProfile;
                   }}
                 />
+                <p>{userData.name}</p>
               </div>
             </div>
 
