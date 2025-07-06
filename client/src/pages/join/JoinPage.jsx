@@ -1,5 +1,5 @@
 //JoinPage.jsx
-
+import fallbackProfile from '../../assets/profile.png';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMicrophone, faVideo, faComments, faTimes, faPaperPlane, faPhone } from '@fortawesome/free-solid-svg-icons';
@@ -9,26 +9,29 @@ import media_access_icon from '../../assets/media_access_icon.svg';
 import { AppContext } from '../../store/app-context';
 import Cookies from 'js-cookie';
 import VideoComponent from '../../components/video/VideoComponent';
-import { createPeerConnAndOffer, AddRemoteIceCandidate, ResponseOffer, ResponseAnswer , reNegotiateConnections ,createPeerConnetionObj} from '../../webRTC/webRTC-utilities';
+import { createPeerConnAndOffer, AddRemoteIceCandidate, ResponseOffer, ResponseAnswer, reNegotiateConnections, createPeerConnetionObj } from '../../webRTC/webRTC-utilities';
+import ChatComponent from '../../components/chat/ChatComponent';
+import useIsMobile from '../../hooks/useIsMobile'; // adjust path as needed
+
 export default function JoinPage() {
   const { userData, peerConnections, offers, answers,
-    roomId, localStream, participants, socketConnection,
+    roomId, localStream, socketConnection,
     setLocalStream, setRoomId, setUserData, setParticipants,
     deletePeerConnections, addPeerConnection, removeRemoteSocketId,
-    loadPeerConnections, setOffers, setAnswers , updatePeerConnections } = useContext(AppContext);
+    loadPeerConnections, setOffers, setAnswers } = useContext(AppContext);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [gridStyle, setGridStyle] = useState({
     gridTemplateColumns: '1fr',
     gridTemplateRows: '1fr'
   });
-  const [messages,setMessages] = useState([]);
+
   const [isMicActive, setIsMicActive] = useState(true);
   const [isCameraActive, setIsCameraActive] = useState(true);
   const [dialogBoxMessage, setDialogBoxMessage] = useState([]);
   const [isModelOpen, setIsModelOpen] = useState(false);
   const mediaRef = useRef();
-  const inputRef = useRef();
   const divRef = useRef();
+  const [isMobile,currentWidth] = useIsMobile(999);
 
   const maxNoOfDevices = 9;
 
@@ -36,8 +39,8 @@ export default function JoinPage() {
     setIsChatOpen(false);
   };
 
-  const openChat = () => {
-    setIsChatOpen(true);
+  const toggleChat = () => {
+    setIsChatOpen(prevValue => !prevValue);
   };
 
   // Toggle microphone
@@ -59,7 +62,7 @@ export default function JoinPage() {
       }
       socketConnection.toggleAudio(roomId);
       // Update each peer connection with the updated tracks
-      
+
     }
   };
 
@@ -72,8 +75,8 @@ export default function JoinPage() {
     setIsCameraActive(enabled);
     if (localStream) {
       const videoTracks = localStream.getVideoTracks();
-      videoTracks.forEach((track)=>{
-         track.enabled = enabled;
+      videoTracks.forEach((track) => {
+        track.enabled = enabled;
       })
       if (enabled) {
         console.log("turning on camera");
@@ -86,32 +89,8 @@ export default function JoinPage() {
     }
   };
 
-  
-  const handleSendMessageByEnter = (event) =>{
-    const value =  inputRef.current.value.trim();
-    if(event.key === 'Enter' && value.length > 0){
-      const msgObj = { info : value, senderName : userData.name};
-      setMessages((pervMessages)=>{
-        inputRef.current.value = '';
-        return [...pervMessages,msgObj];
-      });
-      socketConnection.sendMessage(roomId,msgObj);
-    }
-  }
 
 
-  const handleSendMessage = () => {
-     const value =  inputRef.current.value.trim();
-    
-     if(value.length > 0){
-       const msgObj = { info : value, senderName : userData.name};
-       setMessages((pervMessages)=>{
-         inputRef.current.value = '';
-         return [...pervMessages,msgObj];
-       });
-       socketConnection.sendMessage(roomId,msgObj);
-     }
-  };
 
   const handleCloseModal = () => {
     setIsModelOpen(false);
@@ -182,7 +161,7 @@ export default function JoinPage() {
 
   useEffect(() => {
     if (peerConnections.length > 0) {
-      offers.map((offerObj) => {
+      offers.forEach((offerObj) => {
         if (!offerObj.responded) {
           const peerConnectionObj = peerConnections.find(connection => connection.remoteSocketId === offerObj.sender_SocketId);
           if (peerConnectionObj?.peerConnection) {
@@ -197,13 +176,13 @@ export default function JoinPage() {
 
   useEffect(() => {
     if (peerConnections.length > 0) {
-      answers.map((answerObj) => {
+      answers.forEach((answerObj) => {
         if (!answerObj.responded) {
           const peerConnectionObj = peerConnections.find(connection => connection.remoteSocketId === answerObj.sender_SocketId);
           if (peerConnectionObj?.peerConnection) {
             ResponseAnswer({ peerConnections, answerObj, socketConnection });
           }
-          answers.responded = false;
+          answers.responded = true;
         }
       });
     }
@@ -211,26 +190,32 @@ export default function JoinPage() {
   }, [answers, peerConnections]);
 
 
- useEffect(()=>{
-    if(mediaRef.current){
+  useEffect(() => {
+    if (mediaRef.current) {
       mediaRef.current.srcObject = localStream;
     }
-    
- },[mediaRef.current]);
 
- useEffect(()=>{
-     if(divRef.current){
-       let value =  isCameraActive ? -1 : 1;
-       divRef.current.style.zIndex =  value;
-     }
- },[isCameraActive]);
+  }, [localStream]);
+
+  useEffect(() => {
+    if (divRef.current) {
+      let value = isCameraActive ? -1 : 1;
+      divRef.current.style.zIndex = value;
+    }
+  }, [isCameraActive]);
 
   useEffect(() => {
 
     let cols, rows;
     let totalDevice = peerConnections.length + 1;
-    cols = (totalDevice > 4 || totalDevice % 3 === 0) ? 3 : (totalDevice % 2 === 0) ? 2 : 1;
-    rows = (totalDevice > 6) ? 3 : (totalDevice > 3) ? 2 : 1;
+    if (totalDevice <= 3 && isMobile && currentWidth <= 830){
+      cols = 1;
+      rows = totalDevice;
+    }
+    else{
+      cols = (totalDevice > 4 || totalDevice % 3 === 0) ? 3 : (totalDevice % 2 === 0) ? 2 : 1;
+      rows = (totalDevice > 6) ? 3 : (totalDevice > 3) ? 2 : 1;
+    }
 
     // Generate device list for grid
 
@@ -287,50 +272,41 @@ export default function JoinPage() {
     const handleAnswerUpdate = (msg) => {
       console.log(msg)
     }
-    
-    const handleMessageRecieved = (msgObj) => {
-      console.log('message recieved',msgObj);
-      setMessages((pervMessages)=>{
-          return [...pervMessages,msgObj];
-      });
-    }
-    
-    const handleIntialMediaDeviceStatus = ({kind,sender_SocketId}) => {
-       console.log("receive_Request_For_Inital_Media_Device_Status");
-       const value = kind === 'video' ? isCameraActive : !isMicActive;
-       socketConnection.initialMicOrCamera({kind,value,remoteSocketId:sender_SocketId});
+
+    const handleIntialMediaDeviceStatus = ({ kind, sender_SocketId }) => {
+      console.log("receive_Request_For_Inital_Media_Device_Status");
+      const value = kind === 'video' ? isCameraActive : !isMicActive;
+      socketConnection.initialMicOrCamera({ kind, value, remoteSocketId: sender_SocketId });
     }
 
 
     socketConnection.socket.on("offer_Update", handleOfferUpdate);
     socketConnection.socket.on("newUserJoined", handleNewUserJoin);
     socketConnection.socket.on("answer_Update", handleAnswerUpdate);
-    socketConnection.socket.on("message_Recieved",handleMessageRecieved);
     socketConnection.socket.on("add_ice_candidate", handleAddICECandidate);
     socketConnection.socket.on("participantLeave", handleParticipantLeave);
     socketConnection.socket.on("received_ICE_Candidate", handleICECandidate);
     socketConnection.socket.on("received_offer_for_you", handleRecievedOffer);
     socketConnection.socket.on("received_answer_for_you", handleRecievedAnswer);
-    socketConnection.socket.on("receive_Request_For_Inital_Media_Device_Status",handleIntialMediaDeviceStatus);
+    socketConnection.socket.on("receive_Request_For_Inital_Media_Device_Status", handleIntialMediaDeviceStatus);
 
     return () => {
       socketConnection.socket.off("offer_Update", handleOfferUpdate);
       socketConnection.socket.off("newUserJoined", handleNewUserJoin);
       socketConnection.socket.off("answer_Update", handleAnswerUpdate);
-      socketConnection.socket.off("message_Recieved",handleMessageRecieved);
       socketConnection.socket.off("add_ice_candidate", handleAddICECandidate);
       socketConnection.socket.off("participantLeave", handleParticipantLeave);
       socketConnection.socket.off("received_ICE_Candidate", handleICECandidate);
       socketConnection.socket.off("received_offer_for_you", handleRecievedOffer);
       socketConnection.socket.off("received_answer_for_you", handleRecievedAnswer);
-      socketConnection.socket.off("receive_Request_For_Inital_Media_Device_Status",handleIntialMediaDeviceStatus);
+      socketConnection.socket.off("receive_Request_For_Inital_Media_Device_Status", handleIntialMediaDeviceStatus);
     };
 
-  }, [peerConnections]);
+  }, [peerConnections,currentWidth]);
 
-  
-//  console.log("mediaRef.current : ",mediaRef.current);
-//  console.log("divRef.current : ",divRef.current);
+
+  //  console.log("mediaRef.current : ",mediaRef.current);
+  //  console.log("divRef.current : ",divRef.current);
 
   return (
     <>
@@ -350,48 +326,44 @@ export default function JoinPage() {
       </DialogBox>
       <main className={style.mainGrid}>
         <div className={style.mainGridItemOne}>
-          <div className={style.devices} style={gridStyle}>
+          <div
+            className={`
+              ${style.devices}
+              ${style.videoGridWrapper}
+              ${isMobile && isChatOpen ? style.hideOnMobile : ''}
+              ${!isMobile && isChatOpen ? style.shrinkWidth : style.fullWidth}
+            `}
+            style={gridStyle}
+          >
             <div key={socketConnection.socket.id} className={style.mediaDevice}>
               <video ref={mediaRef} autoPlay muted className={style.videotag}></video>
               <div ref={divRef} className={style.imageContainer}>
-                  <img className={style.userProfile} src={userData.picture} alt="user-profile" />
+                <img
+                  className={style.userProfile}
+                  src={userData.picture}
+                  alt="user-profile"
+                  onError={(e) => {
+                    e.currentTarget.src = fallbackProfile;
+                  }}
+                />
+                <p>{userData.name}</p>
               </div>
             </div>
-            { peerConnections.map(connection => {
-              return (<VideoComponent key={connection?.remoteSocketId} connection={connection} />);
-            })}
+
+            {peerConnections.map(connection => (
+              <VideoComponent key={connection?.remoteSocketId} connection={connection} />
+            ))}
           </div>
-          <div className={isChatOpen ? style.chat : style.chatClose}>
-            <div className={style.chatItem}>
-              <h2>In-call-message</h2>
-              <button className={style.closeButton} onClick={closeChat}>
-                <FontAwesomeIcon icon={faTimes} />
-              </button>
-            </div>
-            <div className={style.message}>
-              {
-                 messages.map((msg,index)=>{
-                    return (<div key={index} className={style.messageInfo} >
-                        <h4>{msg?.senderName}</h4>
-                        <p>{msg?.info}</p>
-                    </div>);                                  
-                 })
-              }
-            </div>
-            <div className={style.messageInput}>
-              <input
-                type="text"
-                placeholder="Type your message..."
-                ref={inputRef}
-                onKeyDown={handleSendMessageByEnter}
-              
-              />
-              <button className={style.sendButton} onClick={handleSendMessage}>
-                <FontAwesomeIcon icon={faPaperPlane} />
-              </button>
-            </div>
+
+          <div className={`
+            ${style.chatWrapper}
+            ${isMobile && !isChatOpen ? style.hideOnMobile : ''}
+            ${!isMobile && !isChatOpen ? style.zeroWidth : ''}
+          `}>
+            <ChatComponent closeChat={closeChat} isChatOpen={isChatOpen} />
           </div>
         </div>
+
         <div className={style.mainGridItemTwo}>
           <button
             className={`${style.controlButton} ${!isMicActive ? style.active : ''}`}
@@ -405,7 +377,7 @@ export default function JoinPage() {
           >
             <FontAwesomeIcon icon={faVideo} />
           </button>
-          <button className={style.controlButton} onClick={openChat}>
+          <button className={style.controlButton} onClick={toggleChat}>
             <FontAwesomeIcon icon={faComments} />
           </button>
           <button className={style.phoneButton} onClick={handleHangUp}>

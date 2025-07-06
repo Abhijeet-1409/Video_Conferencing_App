@@ -2,56 +2,47 @@
 
 .mainGrid {
     height: 100%;
+    min-height: 0;
     max-height: 100vh;
     width: 100%;
     display: grid;
     grid-template-columns: auto;
-    grid-template-rows: 9fr 1fr; 
+    grid-template-rows: 9fr 1fr;
     background-color: #121212; /* Dark background */
     color: #ffffff; /* Light text for contrast */
+     overflow: hidden;
   }
-  
+
   .mainGridItemOne {
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+    height: 100%;
+    overflow: hidden;
   }
-  
+
   .devices {
     width: 100%;
     height: 100%;
     display: grid;
-    padding: 1rem 8rem;
-    gap: .75rem;
+    padding: 1rem 6rem;
+    gap: 0.5rem 1rem;
+    align-items: center;
+    justify-items: center;
+    border-radius: 2px;
     background-color: #1f1f1f; /* Darker background for devices section */
   }
 
 
-  
-  .chat {
-    width: 30%;
-    height: 100%;
-    border-radius: 15px;
-    background-color: whitesmoke; /* Dark background for chat */
-    display: grid;
-    grid-template-rows: 1fr 9fr 1fr;  
-    padding: 0.25rem 1rem;
-  }
-  
-  .chatClose {
-    display: none; 
-  }
-  
+
   .mainGridItemTwo {
     background-color: #1f1f1f; /* Darker background */
     display: flex;
     justify-content: center;
     align-items: center;
   }
-  
-  
-  
- 
+
 
   .controlButton {
     background-color: black;
@@ -64,73 +55,11 @@
     transition: background-color 0.3s ease;
     font-size: 20px; /* Adjust icon size */
   }
-  
+
   .controlButton.active {
     background-color: red;
   }
-  
-  .closeButton, .sendButton {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: black;
-    font-size: 20px; /* Adjust icon size */
-    margin-left: 10px;
-  }
-  
-  .closeButton:hover, .sendButton:hover {
-    color: lightblue    ;
-  }
-  
-  .messageInput {
-    display: flex;
-    align-items: center;
-    margin-top: 10px;
-  }
-  
-  .messageInput input {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
-    outline: none;
-  }
-  
-  .messageInput button {
-    padding: 10px;
-    margin-left: 10px;
-    background-color: black;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .messageInput button:hover {
-    background-color: #333;
-  }
 
-  .chatItem{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: #000;
-  }
-
-  .message {
-    border: 1px solid grey;
-    background-color: white;
-    color: #000;
-    height: 100%;
-    max-height: 500px; /* Set a fixed height for the div */
-    overflow-y: auto; /* Enable vertical scrolling */
-    overflow-x: hidden; /* Prevent horizontal scrolling */
-    border-radius: 5px;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.755);
-  }
 
   .phoneButton {
     background-color: red;
@@ -143,23 +72,20 @@
     transition: background-color 0.3s ease;
     font-size: 20px; /* Adjust icon size */
   }
-  
+
   .phoneButton:hover {
     background-color: darkred;
   }
 
 
-
-
-
 .DialogBoxChildren{
   display: grid;
-  grid-template-columns: 6fr 4fr; 
+  grid-template-columns: 6fr 4fr;
 }
 
 .DialogBoxImage{
   width: 100%;
-  height: 100%;  
+  height: 100%;
 }
 
 .DialogBoxImage img{
@@ -173,12 +99,14 @@
   flex-direction: column;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center; 
+  justify-content: center;
 }
 
 .imageContainer {
   position: absolute; /* Adding position */
   display: flex;
+  flex-direction: column;
+  gap: 1rem;
   justify-content: center;
   align-items: center;
   height: 100%;
@@ -189,8 +117,12 @@
 
 .userProfile {
   border-radius: 100%;
-  width:  30%;
-  height: 30%;
+  width: 30%;
+  height: auto;
+  max-width: 120px;   /* ✅ maximum size */
+  min-width: 60px;    /* ✅ minimum size */
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
   background: transparent;
   z-index: inherit;
 }
@@ -221,14 +153,94 @@
   z-index: 0;
 }
 
-.messageInfo{
-  width: 100%;
+.videoGridWrapper {
+  display: grid;
+  height: 100%;
+  z-index: 2;
+  padding: 1.5rem;
+  background-color:  #1f1f1f;
+}
+
+.chatWrapper {
+  width: 30%; /* desktop width */
+  height: 100%;
+  overflow: hidden;
+  z-index: 3;
   display: flex;
-  flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  padding: 0.5rem 0.1rem;
-  word-wrap: break-word; /* Ensures long words wrap to the next line */
-  overflow-wrap: break-word; /* Ensures long words wrap to the next line */
+  align-items: center;
+  background-color: #1f1f1f;
+  transition: width 0.3s ease-in-out;
+}
+
+/* Conditional widths for video grid */
+.fullWidth {
+  width: 100%;
+}
+
+.shrinkWidth {
+  width: 70%;
+}
+
+.zeroWidth {
+  width: 0 !important;
+  min-width: 0;
+  overflow: hidden;
+  transition: width 0.3s ease;
+}
+
+/* Utility to hide something on mobile */
+.hideOnMobile {
+  display: none !important;
+}
+
+@media screen and (min-width: 1000px) and (max-width: 1300px) {
+   .shrinkWidth{
+    width:  65%;
+   }
+   .chatWrapper{
+    width: 35%;
+   }
+   .devices{
+      padding: 1rem 2rem;
+   }
+
+}
+
+/* ========== RESPONSIVE STYLES FOR MOBILE ========== */
+@media screen and (max-width: 999px) {
+  .videoGridWrapper,
+  .chatWrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100%;
+  }
+
+  .chatWrapper {
+    z-index: 3;
+    background-color: #1f1f1f;
+  }
+
+  .videoGridWrapper {
+    z-index: 2;
+  }
+
+  .mediaDevice{
+    height: 90%;
+    width: 90%;
+  }
+
+  .devices{
+    gap: 0.15rem ;
+    padding: 1rem 2rem;
+  }
+}
+
+
+@media screen and (max-width: 600px) {
+  .mainGridItemTwo {
+    flex-wrap: wrap;
+  }
 }

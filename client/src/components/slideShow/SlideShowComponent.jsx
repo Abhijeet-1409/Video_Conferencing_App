@@ -41,7 +41,7 @@ export default function SlideShow() {
                 <button className={style.gridButton} onClick={prevSlide}>&lt;</button>
             </div>
             <div className={style.gridItem}>
-                <img src={slideShowContent[slideIndex].imageSrc} alt={slideShowContent[slideIndex].title} className={style.image}/>
+                <img src={slideShowContent[slideIndex].imageSrc} alt={slideShowContent[slideIndex].title} height={300} width={300} className={style.image}/>
                 <h2>{slideShowContent[slideIndex].title}</h2>
                 <p>{slideShowContent[slideIndex].description}</p>
             </div>

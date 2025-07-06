@@ -3,6 +3,7 @@ import style from './VideoComponent.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from "../../store/app-context";
+import fallbackProfile from '../../assets/profile.png';
 
 export default function VideoComponent({ connection }) {
     const { socketConnection } = useContext(AppContext);
@@ -11,7 +12,7 @@ export default function VideoComponent({ connection }) {
     const divRef = useRef(null);
     const iconRef = useRef(null);
     const videoRef = useRef(null);
-    
+
     useEffect(()=>{
         if (videoRef.current) {
             videoRef.current.srcObject = connection.remoteStream;
@@ -47,23 +48,23 @@ export default function VideoComponent({ connection }) {
                 setCamera(isCameraActive);
             }
         };
-         
+
         const handleInitialMicOrCamera =({kind,value,sender_SocketId}) =>{
             if(connection.remoteSocketId === sender_SocketId){
                 if(kind === 'video'){
                   setCamera(value);
-                } 
+                }
                 else{
                   setMic(value);
-                } 
+                }
             }
         };
-        
+
         socketConnection.socket.on("msgToToggleVideo", handleToggleVideo);
         socketConnection.socket.on("msgTotoggleAudio", handleToggleAudio);
         connection.peerConnection.addEventListener('track', handleTrack);
         socketConnection.socket.on("receive_Intial_Mic_Or_Camera_Status",handleInitialMicOrCamera);
-        
+
         return () => {
             socketConnection.socket.off("msgToToggleVideo", handleToggleVideo);
             socketConnection.socket.off("msgTotoggleAudio", handleToggleAudio);
@@ -92,7 +93,15 @@ export default function VideoComponent({ connection }) {
             <FontAwesomeIcon icon={faMicrophoneSlash} ref={iconRef} className={style.fontIcon} />
             <video ref={videoRef} autoPlay className={style.videotag}></video>
             <div ref={divRef} className={style.imageContainer}>
-                <img className={style.userProfile} src={connection.remoteUserData.picture} alt="user-profile" />
+                <img
+                    className={style.userProfile}
+                    src={connection.remoteUserData.picture}
+                    alt="user-profile"
+                    onError={(e) => {
+                        e.currentTarget.src = fallbackProfile;
+                    }}
+                />
+                <p>{connection.remoteUserData.name}</p>
             </div>
         </div>
     );
