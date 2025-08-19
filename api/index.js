@@ -14,6 +14,7 @@ const crypto = require('crypto');
 const MONGOUSERNAME = process.env.MONGOUSERNAME;
 const MONGOPASSWORD = process.env.MONGOPASSWORD;
 const MONGODBNAME = process.env.MONGODBNAME;
+const PORT = process.env.PORT || 8080;
 
 const URI = `mongodb+srv://${MONGOUSERNAME}:${MONGOPASSWORD}@cluster0.pnufpgg.mongodb.net/${MONGODBNAME}?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -79,9 +80,7 @@ io.on("connection", (socket) => {
 
 
   socket.on('createRoom', async () => {
-    console.log("createRoom");
     try {
-      console.log("createRoom");
       const roomId = await generateUniqueRoomId();
       await Room.create({ roomId, participants: [] });
       socket.emit('roomCreatedSuccessfully', roomId);
@@ -92,7 +91,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on('joinRoom', async ({ roomId, userData }) => {
-    console.log("joinRoom");
     try {
       const room = await Room.findOne({ roomId });
 
@@ -132,7 +130,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("message_Sent", async ({ roomId, msgObj }) => {
-    console.log("message_Sent");
     try {
       socket.to(roomId).emit('message_Recieved', msgObj);
       const { info, senderName } = msgObj;
@@ -143,7 +140,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("send_ICE_Candidate", ({ roomId, userData, iceCandidate }) => {
-    console.log("send_ICE_Candidate");
     let msg = `there is no user with socketId : ${socket.id} and userName : ${userData.name} to add ICE Candidate`;
     const participant = inMemoryParticipants.find(
       inMemoParticpant => (
@@ -160,14 +156,12 @@ io.on("connection", (socket) => {
   });
 
   socket.on("offer", ({ roomId, offer, receiver_SocketId }) => {
-    console.log("offer");
     const offerObj = { responded: false, roomId, offer, sender_SocketId: socket.id, receiver_SocketId };
     inMemoryOffers.push(offerObj);
     io.to(receiver_SocketId).emit('received_offer_for_you', offerObj);
   });
 
   socket.on("answer", ({ roomId, answer, receiver_SocketId }, ackFunc) => {
-    console.log("answer");
     const participant = inMemoryParticipants.find(
       inMemoParticpant => (
         inMemoParticpant.roomId === roomId &&
@@ -181,7 +175,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("ask_For_ICE_Candidate", ({ roomId, receiver_SocketId }, ackFunc) => {
-    console.log("ask_For_ICE_Candidate");
     const participant = inMemoryParticipants.find(
       inMemoParticpant => (
         inMemoParticpant.roomId === roomId &&
@@ -193,7 +186,6 @@ io.on("connection", (socket) => {
 
 
   socket.on("LeaveRoom", ({ roomId }) => {
-    console.log("leaveRoom");
     const roomParticipants = inMemoryParticipants.filter(
       inMemoParticpant => (
         inMemoParticpant.roomId === roomId &&
@@ -208,7 +200,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("offer_Responded", (offerObj) => {
-    console.log("offer_Responded");
     let msg = 'offer is not updated';
     const actualOffer = inMemoryOffers.find(
       inMemoOfferObj => (
@@ -224,7 +215,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("answer_Responded", (answerObj) => {
-    console.log("answer_Responded");
     let msg = 'answer is not updated';
     const actualAnswer = inMemoryAnswers.find(
       inMemoAnswerObj => (
@@ -240,27 +230,22 @@ io.on("connection", (socket) => {
   });
 
   socket.on("toggleVideo", (roomId) => {
-    console.log("toggleVideo");
     socket.broadcast.to(roomId).emit("msgToToggleVideo", socket.id);
   });
 
   socket.on("toggleAudio", (roomId) => {
-    console.log("toggleAudio");
     socket.broadcast.to(roomId).emit("msgTotoggleAudio", socket.id);
   });
 
   socket.on("intial_Mic_Or_Camera_Status", ({ kind, value, remoteSocketId }) => {
-    console.log("intial_Mic_Or_Camera_Status");
     io.to(remoteSocketId).emit("receive_Intial_Mic_Or_Camera_Status", { kind, value, sender_SocketId: socket.id });
   });
 
   socket.on("ask_For_Initial_Camera_Or_Mic_Status", ({ kind, remoteSocketId }) => {
-    console.log("ask_For_Initial_Camera_Or_Mic_Status");
     io.to(remoteSocketId).emit("receive_Request_For_Inital_Media_Device_Status", { kind, sender_SocketId: socket.id });
   });
 
   socket.on("disconnect", () => {
-    console.log("disconnect");
 
     const participant = inMemoryParticipants.find(
       inMemoParticipant => inMemoParticipant.socketId === socket.id
@@ -300,7 +285,7 @@ io.on("connection", (socket) => {
 
 mongoose.connect(URI,)
   .then(() => {
-    server.listen(8000, () => {
+    server.listen(PORT, () => {
       console.log('Server is running on http://localhost:8000');
     });
   })
