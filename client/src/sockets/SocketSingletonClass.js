@@ -2,6 +2,8 @@
 
 import { io } from "socket.io-client";
 
+const backend_url = import.meta.env.VITE_BACKEND_URL;
+
 class Socket {
 
     static instance = null;
@@ -9,7 +11,7 @@ class Socket {
 
     constructor() {
         if (!Socket.instance) {
-            this.socket = io("http://localhost:8000", {
+            this.socket = io(backend_url, {
                 transports: ['websocket'], // Ensure only websocket transport is used
                 withCredentials: false, // Disable sending cookies in cross-origin requests
                 extraHeaders: {
