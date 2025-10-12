@@ -15,6 +15,8 @@ const MONGOUSERNAME = process.env.MONGOUSERNAME;
 const MONGOPASSWORD = process.env.MONGOPASSWORD;
 const MONGODBNAME = process.env.MONGODBNAME;
 const PORT = process.env.PORT || 8080;
+const MODE = process.env.MODE;
+const CLIENT_URL = MODE == "production" ? process.env.CLIENT_URL : "http://localhost:5173"
 
 const URI = `mongodb+srv://${MONGOUSERNAME}:${MONGOPASSWORD}@cluster0.pnufpgg.mongodb.net/${MONGODBNAME}?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -69,7 +71,13 @@ async function generateUniqueRoomId() {
   return roomId;
 }
 
-app.use(cors());
+const corsOptions = {
+  origin: CLIENT_URL,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -286,7 +294,7 @@ io.on("connection", (socket) => {
 mongoose.connect(URI,)
   .then(() => {
     server.listen(PORT, () => {
-      console.log('Server is running on http://localhost:8000');
+      console.log(`Server is running on http://localhost:${PORT}`);
     });
   })
   .catch((error) => {

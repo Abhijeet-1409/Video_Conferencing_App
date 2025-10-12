@@ -2,7 +2,9 @@
 
 import { io } from "socket.io-client";
 
-const backend_url = import.meta.env.VITE_BACKEND_URL;
+const vite_mode = import.meta.env.VITE_MODE;
+
+const backend_url = vite_mode == "production" ? import.meta.env.VITE_BACKEND_URL : "http://localhost:8000";
 
 class Socket {
 
@@ -13,10 +15,7 @@ class Socket {
         if (!Socket.instance) {
             this.socket = io(backend_url, {
                 transports: ['websocket'], // Ensure only websocket transport is used
-                withCredentials: false, // Disable sending cookies in cross-origin requests
-                extraHeaders: {
-                    "Access-Control-Allow-Origin": "*", // Set CORS header explicitly
-                },
+                withCredentials: true, // Disable sending cookies in cross-origin requests
             });
             Socket.instance = this;
         }
