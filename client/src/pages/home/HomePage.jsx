@@ -11,10 +11,12 @@ import { AppContext } from '../../store/app-context';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin, googleLogout } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
+import useIsMobile from '../../hooks/useIsMobile';
 
 export default function HomePage() {
     const { userData, socketConnection, setRoomId, setUserData, setParticipants } = useContext(AppContext);
     const [isModelOpen, setIsModelOpen] = useState(false);
+    const [isMobile, currentWidth] = useIsMobile(500);
     const [localRoomId, setLocalRoomId] = useState("");
     const [imageKey, setImageKey] = useState(Date.now());
     const [msg, setMsg] = useState("");
@@ -94,13 +96,23 @@ export default function HomePage() {
                         MsgTag
                     ) : (
                         localRoomId.length > 0 && msg.length === 0 && (
-                            <>
-                                <h2>Here's your joining info</h2>
-                                <p>Send this to people you want to meet with.</p>
-                                <p>Be sure to save it so you can use it <span className={styles.nowrap}>later, too.</span></p>
-                                {/* <p>http://localhost:5173/roomid={localRoomId}</p> */}
-                                <p><strong>code</strong> : {localRoomId}</p>
-                            </>
+                            isMobile ? (
+                                <>
+                                    <h2>Here's your joining info</h2>
+                                    <p>
+                                        Send this to people you want to meet with.
+                                        Be sure to save it so you can use it <span className={styles.nowrap}>later, too.</span>
+                                    </p>
+                                    <p><strong>code</strong> : {localRoomId}</p>
+                                </>
+                            ) : (
+                                <>
+                                    <h2>Here's your joining info</h2>
+                                    <p>Send this to people you want to meet with.</p>
+                                    <p>Be sure to save it so you can use it <span className={styles.nowrap}>later, too.</span></p>
+                                    <p><strong>code</strong> : {localRoomId}</p>
+                                </>
+                            )
                         )
                     )
                 ) : (
@@ -121,7 +133,7 @@ export default function HomePage() {
                             src={userData?.picture}
                             alt="profile"
                             key={imageKey}
-                             onError={(e) => {
+                            onError={(e) => {
                                 e.currentTarget.src = fallbackProfile;
                             }}
                         />
