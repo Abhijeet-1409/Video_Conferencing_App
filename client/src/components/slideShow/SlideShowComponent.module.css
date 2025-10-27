@@ -1,39 +1,47 @@
 .gridContainer {
   width: 100%;
-  height: 60%;
+  height: auto;
   padding: 0 0.5rem;
   display: grid;
   grid-template-columns: 2fr 6fr 2fr;
   grid-template-rows: auto;
-  overflow: hidden; /* Hide any overflowing content */
+  overflow: hidden;
   position: relative;
+  text-align: center;
 }
 
+/* Slideshow content */
 .gridItem {
   display: flex;
   flex-direction: column;
   justify-items: center;
   align-items: center;
   text-align: center;
-  overflow: hidden; /* Prevent scrollbars by hiding overflow */
+  overflow: hidden;
   padding: 1rem;
 }
 
-.gridItem img {
+.image {
   width: 100%;
-  height: 250px; /* Limit the height of the image */
+  height: 250px;
   object-fit: contain;
 }
 
 .gridItem h2 {
   margin: 0.25rem 0;
-  font-size: 1rem;
+  font-size: 1.25rem;
+  word-wrap: break-word;
+  line-height: 1.2;
 }
 
 .gridItem p {
-  font-size: 0.75rem;
+  font-size: 0.9rem;
+  color: #444;
+  margin-top: 0.25rem;
+  word-wrap: break-word;
 }
 
+/* Buttons on side by default */
 .gridButtonContainer {
   display: flex;
   flex-direction: column;
@@ -47,49 +55,142 @@
   color: #007bff;
   font-size: 2rem;
   cursor: pointer;
+  transition: color 0.2s ease;
 }
 
 .gridButton:hover {
   color: #0056b3;
 }
 
-/* Tablet devices: widths greater than 320px and up to 1023px */
-@media (min-width: 321px) and (max-width: 1023px) {
+/* --- Fade animation --- */
+.fadeIn {
+  opacity: 1;
+  transition: opacity 0.3s ease-in;
+}
+
+.fadeOut {
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+/* --- Loading State --- */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 250px;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 0.5rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Mobile button bar (hidden by default) --- */
+.mobileButtonBar {
+  display: none;
+}
+
+/* -------- Responsive adjustments -------- */
+
+/* Small devices (below 400px) */
+@media (max-width: 400px) {
+  .gridContainer {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    padding: 0.5rem;
+  }
+
+  /* Hide side buttons */
+  .gridButtonContainer {
+    display: none;
+  }
+
+  /* Mobile button bar below the content */
+  .mobileButtonBar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem; /* space between arrows */
+    margin-top: 0.75rem;
+  }
+
+  .gridButton {
+    font-size: 1.75rem;
+  }
+
+  .image {
+    height: 200px;
+  }
+
+  .gridItem h2 {
+    font-size: 1rem;
+  }
+
+  .gridItem p {
+    font-size: 0.75rem;
+  }
+}
+
+/* Medium screens (401px–1023px) */
+@media (min-width: 401px) and (max-width: 1023px) {
   .gridContainer {
     padding: 0 1rem;
     grid-template-columns: 1fr 8fr 1fr;
   }
-  .gridItem img {
+
+  .image {
     height: 200px;
   }
+
   .gridItem h2 {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
+
   .gridItem p {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
   }
+
   .gridButton {
-    font-size: 2.25rem;
+    font-size: 2rem;
   }
 }
 
-/* Laptop devices: widths 1024px and above */
+/* Laptop and larger */
 @media (min-width: 1024px) {
   .gridContainer {
     width: 60%;
     padding: 0 2rem;
     grid-template-columns: 1fr 8fr 1fr;
   }
-  .gridItem img {
-    height: 200px;
+
+  .image {
+    height: 220px;
   }
 
   .gridItem h2 {
     font-size: 1.5rem;
   }
+
   .gridItem p {
     font-size: 1rem;
   }
+
   .gridButton {
     font-size: 3rem;
   }
